@@ -10,8 +10,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class PasswordApplication extends Application {
-    // TODO: Give your app a anme!
-    final private String applicationName = "My Password Manager";
+    final private String applicationName = "Simple Password Manager";
     static Stage primaryStage = null;
     @Override
     public void start(Stage stage) throws IOException {
