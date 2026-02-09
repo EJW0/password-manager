@@ -169,14 +169,19 @@ public class PasswordModel {
 
         // TODO: Add the new password to the file
         try {
-            BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile, true));     // input true to FileWriter for append mode
-            bf.append("\n" + password.getLabel() + separator + password.getPassword());
-            bf.close();
+
+                BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile, true));     // input true to FileWriter for append mode
+                bf.append("\n" + passwords.getLast().getLabel() + separator + password.getPassword());
+                //add encrypted password
+
+                bf.close();
+
         }
         catch (IOException e) {
             System.out.println("Error: Could not open passwords.txt");
             return;
         }
+
     }
 
     // TODO: Tip: Break down each piece into individual methods, for example: generateSalt(), encryptPassword, generateKey(), saveFile, etc ...
@@ -199,4 +204,6 @@ public class PasswordModel {
         SecretKey privateKey = factory.generateSecret(spec);
         return privateKey.getEncoded();
     }
+
+
 }
