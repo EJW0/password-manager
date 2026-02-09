@@ -81,13 +81,21 @@ public class PasswordModel {
         }
 
         int tabIndex = firstLine.indexOf(separator);
+        if (tabIndex == -1) {
+            System.out.println("Error: Invalid password file format.");
+            return false;
+        }
+
         String salt = firstLine.substring(0, tabIndex);
         String encryptedToken = firstLine.substring(tabIndex + 1, firstLine.length());
-        System.out.println("Read salt: " + salt + ", token: " + encryptedToken);
+        System.out.println("File read. Salt: " + salt + ", token: " + encryptedToken);
+
+        byte[] saltBytes;
+        saltBytes = Base64.getDecoder().decode(salt);
 
         byte[] encoded;
         try {
-            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 600000, 256);
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 600000, 256);
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             SecretKey privateKey = factory.generateSecret(spec);
             encoded = privateKey.getEncoded();
