@@ -7,7 +7,10 @@ import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
@@ -24,7 +27,6 @@ public class PasswordModel {
     static private byte [] passwordFileKey;
     static private byte [] passwordFileSalt;
 
-    // TODO: You can set this to whatever you like to verify that the password the user entered is correct
     private static String verifyString = "cookies";
 
     private void loadPasswords() {
@@ -40,10 +42,36 @@ public class PasswordModel {
         return passwordFile.exists();
     }
 
-    static public void initializePasswordFile(String password) throws IOException {
+    static public void initializePasswordFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        //user types in pass but no passwords.txt file exists
         passwordFile.createNewFile();
 
+        //Make salt
+        String salt = Base64.getEncoder().encodeToString("MsSmith".getBytes());
+        System.out.println(salt);
+
         // TODO: Use password to create token and save in file with salt (TIP: Save these just like you would save password)
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 600000, 256);
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        SecretKey privateKey = factory.generateSecret(spec);
+        byte [] encoded = privateKey.getEncoded();
+
+        Cipher cipher = Cipher.getInstance("AES");
+        SecretKeySpec key = new SecretKeySpec(encoded, "AES");
+
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte [] encryptedData = cipher.doFinal(verifyString.getBytes());
+
+        String encryptedToken = new String(Base64.getEncoder().encode(encryptedData));
+        System.out.println(encryptedToken);
+
+        BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile));
+        bf.write(salt + "\t" + encryptedToken);
+        bf.close();
+
+
+
+
     }
 
     static public boolean verifyPassword(String password) {

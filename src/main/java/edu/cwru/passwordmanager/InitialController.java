@@ -8,8 +8,14 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ResourceBundle;
 
 public class InitialController implements Initializable {
@@ -28,7 +34,7 @@ public class InitialController implements Initializable {
     }
 
     @FXML
-    protected void passwordButtonClicked() throws IOException {
+    protected void passwordButtonClicked() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         String passwordFilePassword = passwordField.getText();
         if (! PasswordModel.passwordFileExists()) {
             PasswordModel.initializePasswordFile(passwordFilePassword);

@@ -27,7 +27,6 @@ public class PasswordListController implements Initializable {
     @FXML private Button saveButton;
 
     public String passcode = null;
-
     public PasswordListController() {
     }
 
