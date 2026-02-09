@@ -43,16 +43,14 @@ public class PasswordModel {
         return passwordFile.exists();
     }
 
+    // If no passwords.txt file, sse password to create token and save in file with salt
     static public void initializePasswordFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        //user types in pass but no passwords.txt file exists
         passwordFile.createNewFile();
 
-        //Make salt
-        String salt = Base64.getEncoder().encodeToString("MsSmith".getBytes());
-        System.out.println(salt);
+        // Generate random salt
+        passwordFileSalt = generateRandomSalt();
 
-        // TODO: Use password to create token and save in file with salt (TIP: Save these just like you would save password)
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 600000, 256);
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), passwordFileSalt, 600000, 256);
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         SecretKey privateKey = factory.generateSecret(spec);
         byte [] encoded = privateKey.getEncoded();
@@ -67,15 +65,13 @@ public class PasswordModel {
         System.out.println(encryptedToken);
 
         BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile));
-        bf.write(salt + "\t" + encryptedToken);
+        bf.write(Base64.getEncoder().encodeToString(passwordFileSalt) + separator + encryptedToken);
         bf.close();
     }
 
     static public boolean verifyPassword(String password) {
         passwordFilePassword = password; // DO NOT CHANGE
         String firstLine = "";
-
-
 
         try (Scanner scn = new Scanner(passwordFile)){
             firstLine = scn.nextLine();
@@ -84,9 +80,10 @@ public class PasswordModel {
             System.out.println("Could not open passwords.txt");
         }
 
-        int tabIndex = firstLine.indexOf('\t');
-        String salt = firstLine.substring(0,tabIndex);
+        int tabIndex = firstLine.indexOf(separator);
+        String salt = firstLine.substring(0, tabIndex);
         String encryptedToken = firstLine.substring(tabIndex + 1, firstLine.length());
+        System.out.println("Read salt: " + salt + ", token: " + encryptedToken);
 
         byte[] encoded;
         try {
@@ -177,4 +174,14 @@ public class PasswordModel {
 
     // TODO: Tip: Break down each piece into individual methods, for example: generateSalt(), encryptPassword, generateKey(), saveFile, etc ...
     // TODO: Use these functions above, and it will make it easier! Once you know encryption, decryption, etc works, you just need to tie them in
+
+    public static byte[] generateRandomSalt() {
+        // String salt = Base64.getEncoder().encodeToString("MsSmith".getBytes());
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+
+        System.out.println("Generated salt: " + Base64.getEncoder().encodeToString(salt));
+        return salt;
+    }
 }
