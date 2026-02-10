@@ -50,16 +50,15 @@ public class PasswordModel {
         // Generate random salt
         passwordFileSalt = generateRandomSalt();
 
-        byte [] encoded = generateKeyFromPassword(password, passwordFileSalt);
-        passwordFileKey = encoded;
+        passwordFileKey = generateKeyFromPassword(password, passwordFileSalt);
 
-        Cipher cipher = Cipher.getInstance("AES");
-        SecretKeySpec key = new SecretKeySpec(encoded, "AES");
+        //Cipher cipher = Cipher.getInstance("AES");
+        //SecretKeySpec key = new SecretKeySpec(encoded, "AES");
+//
+        //cipher.init(Cipher.ENCRYPT_MODE, key);
+        //byte [] encryptedData = cipher.doFinal(verifyString.getBytes());
 
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        byte [] encryptedData = cipher.doFinal(verifyString.getBytes());
-
-        String encryptedToken = new String(Base64.getEncoder().encode(encryptedData));
+        String encryptedToken = encrypt(verifyString);
         System.out.println("Generated token: " + encryptedToken);
 
         BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile));
@@ -173,7 +172,7 @@ public class PasswordModel {
             BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile, true));     // input true to FileWriter for append mode
             bf.append("\n" + passwords.getLast().getLabel() + separator + password.getPassword());
             //add encrypted password
-            System.out.println("Encrypt: " + encrypt(passwordFileKey, passwordFileSalt, "test"));
+            System.out.println("Encrypt: " + encrypt("test"));
 
             bf.close();
 
@@ -206,23 +205,18 @@ public class PasswordModel {
         return privateKey.getEncoded();
     }
 
-    static public String encrypt(byte[] keyString, byte[] salt, String message){
-        KeySpec spec = new PBEKeySpec(keyString.toString().toCharArray(), salt, 600000, 256);
+    static public String encrypt(String message){
         try{
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            SecretKey privateKey = factory.generateSecret(spec);
-            byte [] encoded = privateKey.getEncoded();
             Cipher cipher = Cipher.getInstance("AES");
-            SecretKeySpec key = new SecretKeySpec(encoded, "AES");
+            SecretKeySpec key = new SecretKeySpec(passwordFileKey, "AES");
+            
             cipher.init(Cipher.ENCRYPT_MODE, key);
-            byte [] encryptedData = cipher.doFinal(message.getBytes());
+            byte[] encryptedData = cipher.doFinal(message.getBytes());
+
             String messageString = new String(Base64.getEncoder().encode(encryptedData));
             return messageString;
         }
         catch (NoSuchAlgorithmException e){
-            return null;
-        }
-        catch (InvalidKeySpecException e){
             return null;
         }
         catch (NoSuchPaddingException e){
@@ -237,9 +231,5 @@ public class PasswordModel {
         catch (BadPaddingException e){
             return null;
         }
-
-
-
-
     }
 }
