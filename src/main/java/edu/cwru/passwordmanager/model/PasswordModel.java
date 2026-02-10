@@ -54,7 +54,6 @@ public class PasswordModel {
 
         //Cipher cipher = Cipher.getInstance("AES");
         //SecretKeySpec key = new SecretKeySpec(encoded, "AES");
-//
         //cipher.init(Cipher.ENCRYPT_MODE, key);
         //byte [] encryptedData = cipher.doFinal(verifyString.getBytes());
 
@@ -117,7 +116,7 @@ public class PasswordModel {
             return false;
         }
 
-        //Decryption
+        // Decryption
         try{
             cipher.init(Cipher.DECRYPT_MODE, key);
         }
