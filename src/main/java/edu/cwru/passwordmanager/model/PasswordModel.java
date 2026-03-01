@@ -108,6 +108,8 @@ public class PasswordModel {
 
         passwordFileKey = generateKeyFromPassword(password, passwordFileSalt);
 
+        passwordFilePassword = password;
+
         //Cipher cipher = Cipher.getInstance("AES");
         //SecretKeySpec key = new SecretKeySpec(encoded, "AES");
         //cipher.init(Cipher.ENCRYPT_MODE, key);
