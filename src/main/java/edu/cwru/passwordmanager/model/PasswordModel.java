@@ -110,12 +110,7 @@ public class PasswordModel {
 
         passwordFilePassword = password;
 
-        //Cipher cipher = Cipher.getInstance("AES");
-        //SecretKeySpec key = new SecretKeySpec(encoded, "AES");
-        //cipher.init(Cipher.ENCRYPT_MODE, key);
-        //byte [] encryptedData = cipher.doFinal(verifyString.getBytes());
-
-        String encryptedToken = encrypt(verifyString);
+        String encryptedToken = encrypt(verifyString, passwordFileKey);
         System.out.println("Generated token: " + encryptedToken);
 
         BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile));
@@ -272,7 +267,7 @@ public class PasswordModel {
             while ((line = br.readLine()) != null) {
                 bw.newLine();
                 if (current == index) {
-                    bw.write(password.getLabel() + separator + encrypt(password.getPassword()));
+                    bw.write(password.getLabel() + separator + encrypt(password.getPassword(), passwordFileKey));
                 } else {
                     bw.write(line);
                 }
@@ -313,6 +308,7 @@ public class PasswordModel {
     // TODO: Tip: Break down each piece into individual methods, for example: generateSalt(), encryptPassword, generateKey(), saveFile, etc ...
     // TODO: Use these functions above, and it will make it easier! Once you know encryption, decryption, etc works, you just need to tie them in
 
+    // Generates a random 16-byte salt from random bytes
     static public byte[] generateRandomSalt() {
         // String salt = Base64.getEncoder().encodeToString("MsSmith".getBytes());
         SecureRandom random = new SecureRandom();
@@ -331,10 +327,10 @@ public class PasswordModel {
         return privateKey.getEncoded();
     }
 
-    static public String encrypt(String message){
+    static public String encrypt(String message, byte[] encryptKey){
         try{
             Cipher cipher = Cipher.getInstance("AES");
-            SecretKeySpec key = new SecretKeySpec(passwordFileKey, "AES");
+            SecretKeySpec key = new SecretKeySpec(encryptKey, "AES");
             
             cipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] encryptedData = cipher.doFinal(message.getBytes());
