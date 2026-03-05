@@ -129,60 +129,22 @@ public class PasswordModel {
 
         byte[] saltBytes = Base64.getDecoder().decode(salt);
 
-        byte[] encoded;
         try {
-            encoded = generateKeyFromPassword(passwordFilePassword, saltBytes);
-        }
-        catch (NoSuchAlgorithmException e) {
-            System.out.println("Error: Algorithm not found");
-            return false;
-        }
-        catch (InvalidKeySpecException f){
-            System.out.println("Error: Invalid key spec");
-            return false;
-        }
+            byte[] fileKey = generateKeyFromPassword(passwordFilePassword, saltBytes);
 
-        Cipher cipher;
-        SecretKeySpec key;
-        try{
-            cipher = Cipher.getInstance("AES");
-            key = new SecretKeySpec(encoded, "AES");
-        }
-        catch (NoSuchAlgorithmException e){
-            System.out.println("Error: Algorithm not found");
-            return false;
-        }
-        catch (NoSuchPaddingException f){
-            System.out.println("Error: No such padding found");
-            return false;
-        }
+            String token = decrypt(encryptedToken, fileKey);
+            System.out.println("Decrypted token: " + token);
 
-        // Decryption
-        try{
-            cipher.init(Cipher.DECRYPT_MODE, key);
+            if (token == null) {
+                return false;
+            }
+            else if (token.equals(verifyString)) {
+                return true;    // Return true only if token can be decrypted with password
+            }
         }
-        catch (InvalidKeyException e){
-            System.out.println("Error: Invalid key");
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            System.out.println("Error: Could not generate key from password.");
             return false;
-        }
-        byte [] decodedData = Base64.getDecoder().decode(encryptedToken);
-        byte [] decryptedData;
-        try{
-            decryptedData = cipher.doFinal(decodedData);
-        }
-        catch (IllegalBlockSizeException e){
-            System.out.println("Error: Illegal block size");
-            return false;
-        }
-        catch (BadPaddingException e){
-            System.out.println("Error: Bad padding");
-            return false;
-        }
-        String token = new String(decryptedData);
-        System.out.println("Decrypted token: " + token);
-
-        if (token.equals(verifyString)){
-            return true;
         }
 
         return false;
