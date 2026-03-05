@@ -50,15 +50,8 @@ public class PasswordModel {
                 return;
             }
 
-            int tabIndex = firstLine.indexOf(separator);
-            if (tabIndex == -1) {
-                System.out.println("Error: Invalid password file format");
-                return;
-            }
-
-            String saltString = firstLine.substring(0, tabIndex);
-            // Save salt bytes
-            passwordFileSalt = Base64.getDecoder().decode(saltString);
+            String encodedSalt = parseFirstLine(firstLine)[0];
+            passwordFileSalt = Base64.getDecoder().decode(encodedSalt);
 
             // Generate key from provided master password
             try {
@@ -117,14 +110,8 @@ public class PasswordModel {
             System.out.println("Error: Could not read file passwords.txt");
         }
 
-        int tabIndex = firstLine.indexOf(separator);
-        if (tabIndex == -1) {
-            System.out.println("Error: Invalid password file format");
-            return false;
-        }
-
-        String salt = firstLine.substring(0, tabIndex);
-        String encryptedToken = firstLine.substring(tabIndex + 1, firstLine.length());
+        String salt = parseFirstLine(firstLine)[0];
+        String encryptedToken = parseFirstLine(firstLine)[1];
         System.out.println("File read.\nSalt: " + salt + "\nToken: " + encryptedToken);
 
         byte[] saltBytes = Base64.getDecoder().decode(salt);
@@ -304,5 +291,21 @@ public class PasswordModel {
             System.out.println("Error: Could not rename tmp.txt to passwords.txt");
             return;
         }
+    }
+
+    // Reads the first line, if it exists in the right format, returns a String array where the first element is the salt
+    // and the second is the token
+    public static String[] parseFirstLine(String line) {
+        int tabIndex = line.indexOf(separator);
+
+        if (tabIndex == -1) {
+            System.out.println("Error: Invalid password file format");
+            return null;
+        }
+
+        String salt = line.substring(0, tabIndex);
+        String token = line.substring(tabIndex + 1);
+
+        return new String[]{salt, token};
     }
 }
