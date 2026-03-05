@@ -75,23 +75,11 @@ public class PasswordModel {
 
                 String[] parts = line.split(separator, 2);
                 String label = parts.length > 0 ? parts[0] : "";
-                String password = parts.length > 1 ? parts[1] : "";
+                String encryptedPassword = parts.length > 1 ? parts[1] : "";
 
-                String decrypted = password;
+                String decryptedPassword = decrypt(encryptedPassword, passwordFileKey);
 
-                // Decrypt
-                try {
-                    Cipher cipher = Cipher.getInstance("AES");
-                    SecretKeySpec key = new SecretKeySpec(passwordFileKey, "AES");
-                    cipher.init(Cipher.DECRYPT_MODE, key);
-                    byte[] decoded = Base64.getDecoder().decode(password);
-                    byte[] plain = cipher.doFinal(decoded);
-                    decrypted = new String(plain);
-                } catch (Exception e) {
-                    System.out.println("Error: Could not decrypt password");
-                }
-
-                passwords.add(new Password(label, decrypted));
+                passwords.add(new Password(label, decryptedPassword));
             }
 
         } catch (IOException e) {
@@ -321,6 +309,25 @@ public class PasswordModel {
         }
         catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
                IllegalBlockSizeException | BadPaddingException e) {
+            System.out.println("Error: Could not encrypt.");
+            return null;
+        }
+    }
+
+    static public String decrypt(String ciphertext, byte[] key) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES");
+            SecretKeySpec cipherKey = new SecretKeySpec(key, "AES");
+
+            cipher.init(Cipher.DECRYPT_MODE, cipherKey);
+            byte[] decoded = Base64.getDecoder().decode(ciphertext);
+
+            byte[] plain = cipher.doFinal(decoded);
+            return new String(plain);
+        }
+        catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+               IllegalBlockSizeException | BadPaddingException e) {
+            System.out.println("Error: Could not decrypt.");
             return null;
         }
     }
