@@ -319,19 +319,8 @@ public class PasswordModel {
             String messageString = new String(Base64.getEncoder().encode(encryptedData));
             return messageString;
         }
-        catch (NoSuchAlgorithmException e){
-            return null;
-        }
-        catch (NoSuchPaddingException e){
-            return null;
-        }
-        catch (InvalidKeyException e){
-            return null;
-        }
-        catch (IllegalBlockSizeException e){
-            return null;
-        }
-        catch (BadPaddingException e){
+        catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+               IllegalBlockSizeException | BadPaddingException e) {
             return null;
         }
     }
