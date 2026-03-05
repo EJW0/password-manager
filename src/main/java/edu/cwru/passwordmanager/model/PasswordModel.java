@@ -234,15 +234,7 @@ public class PasswordModel {
             return;
         }
 
-        // Replace original file with tmp file
-        if (!passwordFile.delete()) {
-            System.out.println("Error: Could not delete original passwords.txt");
-            return;
-        }
-        if (!tmpFile.renameTo(passwordFile)) {
-            System.out.println("Error: Could not rename tmp.txt to passwords.txt");
-            return;
-        }
+        replaceFile(passwordFile, tmpFile);
     }
 
     public void updatePassword(Password password, int index) {
@@ -278,15 +270,7 @@ public class PasswordModel {
             return;
         }
 
-        // Replace original file with tmp file
-        if (!passwordFile.delete()) {
-            System.out.println("Error: Could not delete original passwords.txt");
-            return;
-        }
-        if (!tmpFile.renameTo(passwordFile)) {
-            System.out.println("Error: Could not rename tmp.txt to passwords.txt");
-            return;
-        }
+        replaceFile(passwordFile, tmpFile);
     }
 
     public void addPassword(Password password) {
@@ -304,9 +288,6 @@ public class PasswordModel {
             return;
         }
     }
-
-    // TODO: Tip: Break down each piece into individual methods, for example: generateSalt(), encryptPassword, generateKey(), saveFile, etc ...
-    // TODO: Use these functions above, and it will make it easier! Once you know encryption, decryption, etc works, you just need to tie them in
 
     // Generates a random 16-byte salt from random bytes
     static public byte[] generateRandomSalt() {
@@ -352,6 +333,18 @@ public class PasswordModel {
         }
         catch (BadPaddingException e){
             return null;
+        }
+    }
+
+    // Deletes the old file and renames the new file to the old file's name
+    public static void replaceFile(File oldFile, File newFile) {
+        if (!oldFile.delete()) {
+            System.out.println("Error: Could not delete original passwords.txt");
+            return;
+        }
+        if (!newFile.renameTo(oldFile)) {
+            System.out.println("Error: Could not rename tmp.txt to passwords.txt");
+            return;
         }
     }
 }
