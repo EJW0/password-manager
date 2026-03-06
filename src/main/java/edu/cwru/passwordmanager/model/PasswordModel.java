@@ -215,10 +215,8 @@ public class PasswordModel {
         System.out.println("Added: " + passwords.getLast().getLabel());
 
         // Add new password to passwords.txt
-        try {
-            BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile, true));     // input true to FileWriter for append mode
+        try (BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile, true));) {
             bf.append("\n" + passwords.getLast().getLabel() + separator + password.getPassword());
-            bf.close();
         }
         catch (IOException e) {
             System.out.println("Error: Could not open passwords.txt");
