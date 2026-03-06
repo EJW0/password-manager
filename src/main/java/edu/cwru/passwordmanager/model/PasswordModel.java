@@ -210,7 +210,8 @@ public class PasswordModel {
 
         // Add new password to passwords.txt
         try (BufferedWriter bf = new BufferedWriter(new FileWriter(passwordFile, true));) {
-            bf.append("\n" + passwords.getLast().getLabel() + separator + password.getPassword());
+            bf.append("\n" + passwords.getLast().getLabel() + separator +
+                      encrypt(password.getPassword(), passwordFileKey));
         }
         catch (IOException e) {
             System.out.println("Error: Could not open passwords.txt");
