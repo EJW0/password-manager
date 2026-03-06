@@ -122,19 +122,13 @@ public class PasswordModel {
             String token = decrypt(encryptedToken, fileKey);
             System.out.println("Decrypted token: " + token);
 
-            if (token == null) {
-                return false;
-            }
-            else if (token.equals(verifyString)) {
-                return true;    // Return true only if token can be decrypted with password
-            }
+            if (token == null) return false;
+            return token.equals(verifyString);
         }
         catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             System.out.println("Error: Could not generate key from password.");
             return false;
         }
-
-        return false;
     }
 
     public ObservableList<Password> getPasswords() {
